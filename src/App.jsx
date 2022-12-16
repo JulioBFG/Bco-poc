@@ -17,24 +17,25 @@ const App = () => {
   const [signature, setSignature] = React.useState('');
   const [shallowSignature, setShallowSignature] = React.useState('');
 
+  const toast = useToast()
+
   const Toast = () => {
-    const toast = useToast()
     return (
       <a onClick={handleSignatureSubmit}>
-      <Button
-      colorScheme="blue"
-      marginBlock={2}
-        onClick={() =>
-          toast({
-            title: 'Signature Saved!',
-            status: 'success',
-            duration: 3000,
-            isClosable: true,
-          })
-        }
-      >
-        Save
-      </Button>
+        <Button
+        colorScheme="blue"
+        marginBlock={2}
+          onClick={() =>
+            toast({
+              title: 'Signature Saved!',
+              status: 'success',
+              duration: 3000,
+              isClosable: true,
+            })
+          }
+        >
+          Save
+        </Button>
       </a>
     )
   }
@@ -48,9 +49,19 @@ const App = () => {
     setShallowSignature(e);
   };
 
-  const handleSignatureSubmit = () => {
-    setSignature(shallowSignature);
+  const handleSignatureSubmit = (e) => {
+     setSignature(shallowSignature);
   }
+
+  const copyToClipBoard = async copyMe => {
+    try {
+      await navigator.clipboard.writeText(copyMe);
+      setCopySuccess('Copied!');
+      
+    } catch (err) {
+      setCopySuccess('Failed to copy!');
+    }
+  };
 
   return (
     <Box  w="100%" p={4} color="black">
@@ -105,15 +116,26 @@ const App = () => {
               
               onChange={e=> handleSignature(e.target.value)}
             />
-            <Toast />
+            <Toast/>
           </Stack>
         </Container>
       ) : (
         <Container padding={4}>
-          <Textarea editable={editable} />
-          <Button marginBlock={2} colorScheme="blue">
-            Copy
-          </Button>
+          <Textarea editable={editable} onChange={e=> setSignature(e.target.value)} />
+          <a 
+            onClick={() =>
+              toast({
+                title: 'Signature Copied!',
+                status: 'success',
+                duration: 3000,
+                isClosable: true,
+              })
+            }
+          >
+            <Button marginBlock={2} colorScheme="blue" onClick={() => copyToClipBoard(signature)}>
+              Copy
+            </Button>
+          </a>
           {copied && (
             <Text fontSize="lg" as="b" color="green">
               Copied!
